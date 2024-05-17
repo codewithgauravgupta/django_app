@@ -160,19 +160,21 @@
     
     user.password
 
-
-
-
-++++++++++++++++++++
+## Add Rest Framework to user app:
 
 * Add rest_framework to installedapps:
-    rest_framework
+    "rest_framework"
+    "rest_framework_simplejwt",
+    "corsheaders",
+    "rest_framework_simplejwt.token_blacklist",
 
 * Create a serializers.py to create a UserSerializer in user app.
 
 * Create viewset; Inside the user directory, rename the view file viewsets.py
 
-* Define a router; At the root of the apps project (all_apps), create a file named routers.py.
+* Define a router; At the root of the apps project (apps), create a file named routers.py.
+
+* Modify root/urls.py for api route.
 
 * make a GET request to http://0.0.0.0:8000/api/user/
 
@@ -182,6 +184,14 @@
 }
 
 * Now that we are done with the user application, we can confidently move on to adding a login and user registration feature to the project, so that users can be authenticated to access the resources.
+
+
+
+++++++++++++++++++++
+
+
+
+
 
 * If the registration of a user is successful, we will provide credentials, here JWTs, so the user won’t have to log in again to start a session—a win for user experience.
 
