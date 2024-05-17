@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     "rest_framework_simplejwt.token_blacklist",
     # User Defined
     "apps",
+    "apps.user",
 ]
 
 MIDDLEWARE = [
@@ -186,6 +187,10 @@ CACHES = {
 
 CACHE_TTL = 60 * 5
 
-print(os.getenv("CORS_ALLOWED_ORIGINS"))
-print(DEBUG)
-print(DATABASES)
+
+# User Defined
+
+# print(os.getenv("CORS_ALLOWED_ORIGINS"))
+# print(DATABASES)
+
+AUTH_USER_MODEL = 'apps_user.User'

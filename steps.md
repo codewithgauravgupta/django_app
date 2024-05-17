@@ -88,6 +88,8 @@
     ALTER ROLE core SUPERUSER;
     ALTER USER core CREATEDB;
 
+* `Do not migrate`
+
 * Connect to configured DB from settings.py:
     
     DATABASES = {
@@ -114,34 +116,28 @@
         }
     }
 
+## Create User app:
 
+* Create user application under apps
+    cd apps && django-admin startapp user
 
+* Modify apps.py of user with label:
+    name = "apps.user"
+    label = "apps_user"
 
+* Create user model in user models.py
 
-
-
-
-
-* Create user application under root_app
-    cd root_app && django-admin startapp user_app
-
-* Create user model in user_app models.py
-
-* Modify apps.py of user with label. 
-
-* Register user_app in settings.py, using name field of apps.py of user_app.
+* Register user in settings.py, using name field of apps.py of user `"apps.user"`.
 
 * We also need to tell Django to use this User model for the authentication user model. In the settings.py file add below at last line:
-    AUTH_USER_MODEL = 'user_app.User'
+    AUTH_USER_MODEL = 'apps_user.User'
 
 * Make Migrations:
     python manage.py makemigrations <app_name>
+    python manage.py makemigrations apps_user
 
 * Run Migrations:
-    python manage.py migrate
-
-* Terminate all psql connection if error in above step:
-    SELECT pg_terminate_backend(pg_stat_activity.pid) FROM pg_stat_activity WHERE pg_stat_activity.datname = 'coredb' AND pid <> pg_backend_pid();
+    python manage.py migrate && python manage.py runserver 0.0.0.0:8000
 
 * Test Migrations:
     python manage.py shell
@@ -163,6 +159,11 @@
     user.email
     
     user.password
+
+
+
+
+++++++++++++++++++++
 
 * Add rest_framework to installedapps:
     rest_framework
@@ -627,3 +628,15 @@ python manage.py migrate
 
 optional at last:
 cd usercode/django-api/ && cp -r runserver.py /usr/local/lib/python3.10/dist-packages/django/core/management/commands/runserver.py  && service postgresql start &&  python manage.py makemigrations && python manage.py migrate && python manage.py runserver > /dev/null 2>&1 &
+
+## DB Migration Issue:
+
+* python manage.py showmigrations
+
+* su postgres -> psql
+
+* Terminate all psql connection if error in above step:
+    SELECT pg_terminate_backend(pg_stat_activity.pid) FROM pg_stat_activity WHERE pg_stat_activity.datname = 'coredb' AND pid <> pg_backend_pid();
+
+* drop database coredb; -> CREATE DATABASE coredb;
+
