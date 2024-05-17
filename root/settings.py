@@ -183,3 +183,7 @@ CACHES = {
 }
 
 CACHE_TTL = 60 * 5
+
+print(os.getenv("CORS_ALLOWED_ORIGINS"))
+print(DEBUG)
+print(DATABASES)
