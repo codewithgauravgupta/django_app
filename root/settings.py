@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     # User Defined
     "apps",
     "apps.user",
+    "apps.auth",
 ]
 
 MIDDLEWARE = [

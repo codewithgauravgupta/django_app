@@ -116,7 +116,7 @@
         }
     }
 
-## Create User app:
+## Create user app:
 
 * Create user application under apps
     cd apps && django-admin startapp user
@@ -183,15 +183,11 @@
     "last_name": "Hey"
 }
 
+
+
+## Create auth app for register and login of users:
+
 * Now that we are done with the user application, we can confidently move on to adding a login and user registration feature to the project, so that users can be authenticated to access the resources.
-
-
-
-++++++++++++++++++++
-
-
-
-
 
 * If the registration of a user is successful, we will provide credentials, here JWTs, so the user won’t have to log in again to start a session—a win for user experience.
 
@@ -206,19 +202,18 @@
     'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
 }
 
-* Creating the auth app, First, we need to write a registration serializer, but before that, let’s create a new application called auth in the all_apps application. It’ll contain all the logic concerning logging in, registration, logging out, and a lot more:
+* Creating the auth app, First, we need to write a registration serializer, but before that, let’s create a new application called auth in the apps application. It’ll contain all the logic concerning logging in, registration, logging out, and a lot more:
 
-    cd all_apps && django-admin startapp auth
+    cd apps && django-admin startapp auth
 
-* rewrite apps.py for auth and register in installedapps
+* rewrite apps.py for auth in installedapps
 
-* Create a Python package called serializers and another one called viewsets in auth. Make sure that these new directories have an __init__.py file. 
+* Create a Python package called serializers and another one called viewsets in auth. Make sure that these new directories have an __init__.py file, with entries in it.
+    from .register import RegisterSerializer
 
-* Inside the serializers directory, create a file called register.py. It’ll contain the code for RegisterSerializer, which is the name of the registration serializer class
+* Inside the serializers directory, create a file called register.py. It’ll contain the code for RegisterSerializer, which is the name of the registration serializer class.
 
-* Next, we can add the viewset and register it in the register.py file
-
-* let’s register the viewset in the routers.py file
+* Next, we can add the viewset by creating a file register.py file in viewsets, also let’s register the viewset in the routers.py file.
 
 * Test endpoint using HTTP Client:
     0.0.0.0:8000/api/auth/register/
@@ -234,6 +229,9 @@
     We will get two tokens.
 
 * If we try sending same request we get a 400 error bad request, as the user already exists.
+
+++++++++++++++++++++
+
 
 * The next step is adding the login endpoint following the same process: writing the serializer and the viewset, and then registering the route.
 
@@ -650,3 +648,6 @@ cd usercode/django-api/ && cp -r runserver.py /usr/local/lib/python3.10/dist-pac
 
 * drop database coredb; -> CREATE DATABASE coredb;
 
+## Restart Postgresql in dev container:
+
+service postgresql --full-restart
