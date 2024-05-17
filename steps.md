@@ -258,10 +258,35 @@
     }
 
     Refresh tokens are exchanged for new access tokens when the current access token expires, without needing the users to log in again and again. This allows continuous access to protected resources and enhances user experience.
-++++++++++++++++++++
+
+## Optimize code using DRY by creating abstract classes for model, serializer and viewsets.
+
+* Lets follow DRY, The DRY(Dont Repeat Yourself) principle is a best practice in software development that encourages software developers to avoid repetition of instructions. We will create a abstract model class, as we will create many models that will have similar fields.
+
+* Inside the `apps` directory, create a new Python package called `abstract`. Once it’s done, create a `models.py` file. In this file, we will write two classes: `AbstractModel` and `AbstractManager`.
+
+* The `AbstractModel` class will contain fields such as `public_id`, `created`, and `updated`. On the other side, the `AbstractManager` class will contain the `function used to retrieve an object by its public_id field`
+
+* As we can see in the Meta class for `AbstractModel`, the abstract attribute is set to `True`. `Django will ignore this class model` and won’t generate migrations for this.
+
+* let’s make a quick `refactor on the User model`: First, let’s `remove the get_object_by_public_id` method to retrieve an object via `public_id`, and let’s subclass `UserManager`.
+
+* On the User model, we’ll remove the `public_id`, `updated`, and `created` fields and subclass the User model with the AbstractModel class. This will normally cause no changes to the database—therefore, there is `no need to run makemigrations` again `unless we’ve changed an attribute of a field`.
+
+* Let’s also add `AbstractSerializer`, which will be used by all the `serializers` we’ll be creating on this project.
+
+* All the `objects sent back as a response in our API will contain the id, created, and updated fields`. It’ll be repetitive to write these fields all over again on every ModelSerializer, so let’s just `create an AbstractSerializer class`. In the abstract directory, `create a file called serializers.py`.
+
+* Once it’s done, we can go and `subclass the UserSerializer class with the AbstractSerializer class`, Once it’s done, we’ll `remove the field declaration of id, created, and updated`.
+
+* one last `abstraction for ViewSets`, But why write an abstract ViewSet? Well, there will be repeated declarations as to the `ordering and the filtering`. Let’s create a class that will contain the default values. In the abstract directory, `create a file called viewsets.py`
+
+* The next step is to add the `AbstractViewSet class to the code where ModelViewSets` is actually called. Go to `apps/user/viewsets.py` and `subclass UserViewSet with the AbstractViewSet class`.
 
 
-* Till now, we used models, serializers, viewsets, and routes to create our first endpoints. 
+## Create post app
+
+* Till now, we used models, serializers, viewsets, and routes to create our first endpoints.
 
 * Lets create a social-media post app, where A post in this project is a long or short piece of text that can be viewed by anyone, irrespective of whether a user is linked or associated to that post.
 
@@ -269,7 +294,7 @@
 
     Authenticated users should be able to create a post.
     Authenticated users should be able to like the post.
-    All users should be able to read the post, even if they aren’t authenticated.
+    All users should be able to read the post, even if they aren’t autherized.
     The author of the post should be able to modify the post.
     The author of the post should be able to delete the post.
 
@@ -281,27 +306,13 @@
 
 * In our case, a user (from the User table) can have many posts (in the Post table) but a post can only have one user. The many-to-many relationship will be used when writing the like feature for the posts.
 
-* Lets follow DRY, The DRY(Dont Repeat Yourself) principle is a best practice in software development that encourages software developers to avoid repetition of instructions. We will create a abstract model class, as we will create many models that will have similar fields.
 
-* Inside the all_apps directory, create a new Python package called abstract. Once it’s done, create a models.py file. In this file, we will write two classes: AbstractModel and AbstractManager.
+++++++++++++++++++++
 
-* The AbstractModel class will contain fields such as public_id, created, and updated. On the other side, the AbstractManager class will contain the function used to retrieve an object by its public_id field
 
-* As we can see in the Meta class for AbstractModel, the abstract attribute is set to True. Django will ignore this class model and won’t generate migrations for this.
 
-* let’s make a quick refactor on the User model: First, let’s remove the get_object_by_public_id method to retrieve an object via public_id, and let’s subclass UserManager.
 
-* On the User model, we’ll remove the public_id, updated, and created fields and subclass the User model with the AbstractModel class. This will normally cause no changes to the database—therefore, there is no need to run makemigrations again unless we’ve changed an attribute of a field.
 
-* Let’s also add AbstractSerializer, which will be used by all the serializers we’ll be creating on this project.
-
-* All the objects sent back as a response in our API will contain the id, created, and updated fields. It’ll be repetitive to write these fields all over again on every ModelSerializer, so let’s just create an AbstractSerializer class. In the abstract directory, create a file called serializers.py.
-
-* Once it’s done, we can go and subclass the UserSerializer class with the AbstractSerializer class, Once it’s done, we’ll remove the field declaration of id, created, and updated.
-
-* one last abstraction for ViewSets, But why write an abstract ViewSet? Well, there will be repeated declarations as to the ordering and the filtering. Let’s create a class that will contain the default values. In the abstract directory, create a file called viewsets.py
-
-* The next step is to add the AbstractViewSet class to the code where ModelViewSets is actually called. Go to all_apps/user/viewsets.py and subclass UserViewSet with the AbstractViewSet class
 
 * Now lets create post app:
     django-admin startapp post
