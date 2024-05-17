@@ -39,6 +39,10 @@
 
     In instance allow post 22, 8000 in security group of instance.
 
+    ssh -i "django_backend_keys.pem" admin@ec2-13-238-194-209.ap-southeast-2.compute.amazonaws.com
+
+
+
 * Create .env file at root of project on both local and ec2:
     SECRET_KEY=DEV_SECRET_KEY
     DJANGO_ALLOWED_HOSTS=*
@@ -65,6 +69,8 @@
 
 * Add label in class of apps in apps.py
     label = 'apps'
+
+* Register apps in settings.py of root INSTALLED_APPS, using name field of apps.py of `apps`.
 
 * Start Django Server:
     python manage.py runserver 0.0.0.0:8000
@@ -114,7 +120,7 @@
 
 
 
-* Register root_app in settings.py of root_project INSTALLED_APPS, using name field of apps.py of root_app.
+
 
 * Create user application under root_app
     cd root_app && django-admin startapp user_app
