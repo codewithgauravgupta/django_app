@@ -183,9 +183,7 @@
     "last_name": "Hey"
 }
 
-
-
-## Create auth app for register and login of users:
+## Create auth app for register of users:
 
 * Now that we are done with the user application, we can confidently move on to adding a login and user registration feature to the project, so that users can be authenticated to access the resources.
 
@@ -230,12 +228,11 @@
 
 * If we try sending same request we get a 400 error bad request, as the user already exists.
 
-++++++++++++++++++++
-
+## auth Login and Referesh API for users:
 
 * The next step is adding the login endpoint following the same process: writing the serializer and the viewset, and then registering the route.
 
-* Inside the all_apps/auth/serializers directory, create a new file called login.py (this file will contain LoginSerializer, a subclass of TokenObtainPairSerializer)
+* Inside the apps/auth/serializers directory, create a new file called login.py (this file will contain LoginSerializer, a subclass of TokenObtainPairSerializer)
 
 * Once the serializer is written, don’t forget to import it to the __init__.py file.
 
@@ -261,6 +258,8 @@
     }
 
     Refresh tokens are exchanged for new access tokens when the current access token expires, without needing the users to log in again and again. This allows continuous access to protected resources and enhances user experience.
+++++++++++++++++++++
+
 
 * Till now, we used models, serializers, viewsets, and routes to create our first endpoints. 
 
