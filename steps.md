@@ -382,14 +382,7 @@ let’s create a post:
     "body": "A simple post edited"
     }
 
-
-++++++++++++++++++++
-
-
-
-
-
-
+## Adding Like Feature to posts:
 
 * Adding Like Feature:
     Add a new posts_liked field to the User model.
@@ -402,11 +395,13 @@ let’s create a post:
 
 * The posts_liked field will contain all the posts liked by a user. The relationship between the User model and the Post model concerning the “Like” feature is many-to-many.
 
-* Open the /all_apps/user/models.py file and add a new field to the User model
+* Open the /apps/user/models.py file and add a new field to the User model
 
-* Inside the all_apps/post/serializers.py file, add new fields to PostSerializer
+* Inside the apps/post/serializers.py file, add new fields to PostSerializer
 
 * Adding endpoints like and remove like actions to PostViewSet.
+
+* makemigrations and migrate
 
 * Test Endpoints, post_pk is post id.
 
@@ -415,6 +410,9 @@ let’s create a post:
 
     http://0.0.0.0:8000/api/post/a795d4d1f7524b4faf0ee37e174914ea/like/
     http://0.0.0.0:8000/api/post/a795d4d1f7524b4faf0ee37e174914ea/remove_like/
+
+++++++++++++++++++++
+
 
 * Adding Comments to Social Media Posts:
     Writing the Comment model.
