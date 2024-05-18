@@ -411,24 +411,9 @@ let’s create a post:
     http://0.0.0.0:8000/api/post/a795d4d1f7524b4faf0ee37e174914ea/like/
     http://0.0.0.0:8000/api/post/a795d4d1f7524b4faf0ee37e174914ea/remove_like/
 
-++++++++++++++++++++
+## Create comment app, to add comments and delete to our posts:
 
-
-* Adding Comments to Social Media Posts:
-    Writing the Comment model.
-
-    Writing the comment serializer.
-
-    Nesting routes for the comment resource.
-
-    Writing the CommentViewSet class.
-
-    Updating a comment.
-
-    Deleting a comment.
-
-    A comment in the context of this project will represent short text that can be viewed by anyone but only be created or updated by authenticated users.
-
+A comment in the context of this project will represent short text that can be viewed by anyone but only be created or updated by authenticated users.
     Any user can read comments.
 
     Authenticated users can create comments under posts.
@@ -438,24 +423,34 @@ let’s create a post:
     The comment author can update posts.
 
 * Create comment app
-    
+
+* Adding Comments to Social Media Posts:
+    Writing the Comment model.
+
+    makemigrations and migrate
+
 * Write comment model based on comment table and Test shell: 
     python manage.py shell
-    from core.comment.models import Comment
-    from core.post.models import Post
-    from core.user.models import User
+    from apps.comment.models import Comment
+    from apps.post.models import Post
+    from apps.user.models import User
     user = User.objects.first()
     post = Post.objects.first()
     comment_data = {"post": post, "author": user, "body": "A comment."}
     comment = Comment.objects.create(**comment_data)
     comment
     comment.body
-    
+
 * now that we are sure that the comment is working, we can write the serializer for the comment feature. 
 
-* Now write endpoints using viewsets.
+* Now write endpoints using viewsets.    Writing the CommentViewSet class.
 
-* Test endpoint /api/post/post_id/comment/ to create comments.
+* Nesting routes for the comment resource.
+
+* Add permissions in permissions.py
+
+* Test endpoint 
+    /api/post/post_pk/comment/comment_pk to create comments.
 
     {
     "author": "fb2d39265992477da9e437335835a6a9",
@@ -463,12 +458,19 @@ let’s create a post:
     "post": ""a795d4d1f7524b4faf0ee37e174914ea""
     }
 
-* Test update comment using PUT: /api/post/post_pk/comment/comment_pk/
+* Test update and delete comment using PUT and DELETE: 
+    /api/post/post_pk/comment/comment_pk/
+
     {
     "author": "fb2d39265992477da9e437335835a6a9",
     "body": "A simple comment edited",
     "post": ""a795d4d1f7524b4faf0ee37e174914ea""
     }    
+
+
+++++++++++++++++++++
+
+
 
 * Testing Application using pytest; Create a file pytest.ini at root of project, i.e. where manage.py is present.
 
