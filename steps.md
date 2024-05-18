@@ -411,7 +411,7 @@ let’s create a post:
     http://0.0.0.0:8000/api/post/a795d4d1f7524b4faf0ee37e174914ea/like/
     http://0.0.0.0:8000/api/post/a795d4d1f7524b4faf0ee37e174914ea/remove_like/
 
-## Create comment app, to add comments and delete to our posts:
+## Create comment app, to add and delete comments to our posts:
 
 A comment in the context of this project will represent short text that can be viewed by anyone but only be created or updated by authenticated users.
     Any user can read comments.
