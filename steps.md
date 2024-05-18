@@ -358,18 +358,16 @@ let’s create a post:
         "body": "A simple post"
     }
 
-++++++++++++++++++++
+## Configure Authorization i.e. permissions: 
 
+* Create a superuser: 
+    `python manage.py createsuperuser --username admin --email admin@example.com`
 
-
-
-
-
-* Configure Authorization i.e. permissions: If authentication is the action of verifying the identity of a user, authorization is simply the action of checking whether the user has the rights or privileges to perform an action.
+* If authentication is the action of verifying the identity of a user, authorization is simply the action of checking whether the user has the rights or privileges to perform an action.
 
 * we hve three types of users, anonymous user, registered, admin. we need to write a custom permission.
 
-* Inside the auth directory, create a file called permissions.py.
+* Inside the `auth` directory, create a file called `permissions.py`.
 
 * Next Allow users to update and delete posts. To add these functionalities, we don’t need to write a serializer or a viewset, because the methods for deletion (destroy()), and updating (update()) are already available by default in the ViewSet class. We will just rewrite the update method on PostSerializer to ensure that the edited field is set to True when modifying a post.
 
@@ -378,10 +376,20 @@ let’s create a post:
 * Also modify the serializer for post.
 
 * Test updating and deleting the post after login:
+    http://0.0.0.0:8000/api/post/176fade8f90444719b14b0c9eac3a540/
     {
     "author": "fb2d39265992477da9e437335835a6a9",
     "body": "A simple post edited"
     }
+
+
+++++++++++++++++++++
+
+
+
+
+
+
 
 * Adding Like Feature:
     Add a new posts_liked field to the User model.

@@ -3,7 +3,7 @@ from apps.user.viewsets import UserViewSet
 from apps.auth.viewsets import RegisterViewSet, LoginViewSet, RefreshViewSet
 from apps.post.viewsets import PostViewSet
 
-router = routers.SimpleRouter()
+router = routers.DefaultRouter()
 
 # ##################################################################### #
 # ################### AUTH                       ###################### #

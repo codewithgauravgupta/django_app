@@ -2,6 +2,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated, AllowAny
+from apps.auth.permissions import UserPermission
 
 from apps.abstract.viewsets import AbstractViewSet
 from apps.post.models import Post
@@ -11,7 +12,9 @@ from apps.post.serializers import PostSerializer
 
 class PostViewSet(AbstractViewSet):
     http_method_names = ('post', 'get', 'put', 'delete')
-    permission_classes = (IsAuthenticated,)
+    # permission_classes = (IsAuthenticated,)
+    permission_classes = (UserPermission,)
+    # permission_classes = (AllowAny,)
     serializer_class = PostSerializer
 
     def get_queryset(self):
