@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     "apps",
     "apps.user",
     "apps.auth",
+    "apps.post",
 ]
 
 MIDDLEWARE = [

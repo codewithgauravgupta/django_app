@@ -283,7 +283,6 @@
 
 * The next step is to add the `AbstractViewSet class to the code where ModelViewSets` is actually called. Go to `apps/user/viewsets.py` and `subclass UserViewSet with the AbstractViewSet class`.
 
-
 ## Create post app
 
 * Till now, we used models, serializers, viewsets, and routes to create our first endpoints.
@@ -306,14 +305,6 @@
 
 * In our case, a user (from the User table) can have many posts (in the Post table) but a post can only have one user. The many-to-many relationship will be used when writing the like feature for the posts.
 
-
-++++++++++++++++++++
-
-
-
-
-
-
 * Now lets create post app:
     django-admin startapp post
 
@@ -328,22 +319,22 @@
 * Let’s test the newly added model by creating an object and saving it in the database:
     python manage.py shell or use django_shell_plus to avoid manual imports.
 
-    from core.post.models import Post
-    from core.user.models import User
+    from apps.post.models import Post
+    from apps.user.models import User
     user = User.objects.first()
     user
 
-    let’s create a dictionary that will contain all the fields needed to create a post:
+* let’s create a dictionary that will contain all the fields needed to create a post:
 
     data = {"author": user, "body":"A simple test"}
 
-    let’s create a post:
+let’s create a post:
 
     post = Post.objects.create(**data)
     post.author
     user.post_set.all()
 
-* writing the serializer of the Post object: The Post serializer will contain the fields needed to create a post when making a request on the endpoint. Let’s add the feature for the post creation first. In the post directory, create a file called serializers.py. 
+* writing the `serializer of the Post object`: The Post serializer will contain the fields needed to create a post when making a request on the endpoint. Let’s add the feature for the post creation first. In the post directory, create a file called `serializers.py`. 
 
 * Writing Post Viewsets, For the following endpoint, we’ll only be allowing the POST and GET methods. This will help us have the basic features working first. The code should follow these rules:
 
@@ -362,11 +353,16 @@
 
     use bearer token from /login
 
-    Post:
-        {
-    "author": "fb2d39265992477da9e437335835a6a9",
-    "body": "A simple post"
+    {
+        "author": "fb2d39265992477da9e437335835a6a9",
+        "body": "A simple post"
     }
+
+++++++++++++++++++++
+
+
+
+
 
 
 * Configure Authorization i.e. permissions: If authentication is the action of verifying the identity of a user, authorization is simply the action of checking whether the user has the rights or privileges to perform an action.
