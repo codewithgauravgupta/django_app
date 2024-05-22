@@ -467,17 +467,25 @@ A comment in the context of this project will represent short text that can be v
     "post": ""a795d4d1f7524b4faf0ee37e174914ea""
     }    
 
+## Testing Rest APIs:
+
+* Testing Application using pytest; Create a file pytest.ini at root of project, i.e. where manage.py is present.
+
+* run command to check if pytest is configured.
+    /django_app/pytest
+
+* Create first test by creating file tests.py at root.
+
+* Run run pytest:
+    /django_app/pytest
+
 
 ++++++++++++++++++++
 
 
 
-* Testing Application using pytest; Create a file pytest.ini at root of project, i.e. where manage.py is present.
 
-* run command to check if pytest is configured.
-    pytest
 
-* Create first test by creating file tests.py at root.
 
 * Lets write test for django models, by creating `tests.py` inside all_apps/user.
 
