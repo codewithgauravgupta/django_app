@@ -484,6 +484,8 @@ A comment in the context of this project will represent short text that can be v
 * For testing post, we will need to create a fixture that will provide user data to post. Create a package `fixtures` in apps. We will have a user fixture by creating `user.py` under `fixtures` directory.
 
 * Inside the core/post directory, create a new file called tests.py. This file will then test for the creation of a post.
+
+* Writing tests for the Comment model requires the same steps as the tests for the Post model. First of all, create a new file called `post.py` in the apps/fixtures directory.
 ++++++++++++++++++++
 
 
