@@ -479,21 +479,18 @@ A comment in the context of this project will represent short text that can be v
 * Run run pytest:
     /django_app/pytest
 
+* Lets write test for django models, by creating `tests.py` inside apps/user.
 
 ++++++++++++++++++++
-
-
-
-
-
-
-* Lets write test for django models, by creating `tests.py` inside all_apps/user.
 
 * For testing post, we will need to create a fixture that will provide user data to post. Create a package `fixtures` in all_apps. We will have a user fixture in user.py under `fixtures` directory.
 
 * Lets write test for django viewsets, CReate  conftest.py at root to create an API client using fixture.
 
 * Inside the all_apps/auth directory, create a file named tests.py. Instead of writing test functions directly, we write a class that will contain the testing methods
+
+
+
 
 * Start Front end developement
 
