@@ -1,14 +1,14 @@
-pytest-django
+pytest-django # Pytest
 asgiref==3.8.1
 certifi==2024.2.2
 chardet==5.2.0
 charset-normalizer==3.3.2
 distro==1.9.0
-Django==5.0.6
-django-cors-headers==4.3.1
-django-filter==24.2
-djangorestframework==3.15.1
-djangorestframework-simplejwt==5.3.1
+Django==5.0.6 # Django
+django-cors-headers==4.3.1 # CORS
+django-filter==24.2 # Django Rest Framework
+djangorestframework==3.15.1 # Django Rest Framework
+djangorestframework-simplejwt==5.3.1 # JWT authentication plugin
 pygments # code highlighting
 markdown # Markdown support for the browsable API.
 drf-nested-routers==0.93.5
@@ -33,6 +33,6 @@ typing_extensions==4.11.0
 urllib3==2.2.1
 wheel==0.43.0
 gunicorn==20.1.0
-psycopg2_binary
+psycopg2_binary # Postgres
 python-dotenv==0.20.0
 django-redis

@@ -1,8 +1,36 @@
-### Setup Local Dev Container
+# Summary
+
+We covered:
+
+* Dev environment using Docker.
+
+* django `models`, `migrations`, `views`, `viewsets`, `templates`, and `URL routing`.
+
+* JSON Web Tokens (JWT) token-based authentication for user verification.
+
+* Revoking JWT tokens: Logout endpoint to denylist tokens.
+
+* Added caching.
+
+* Create REST APIs using Django-Rest-Framework(DRF)
+
+* Pytest for testing models and viewsets.
+
+* Manual and Automatic Deployment on AWS using CI/CD pipeline using github workflows.
+
+* serve the API and the React frontend over HTTPS using AWS CloudFront.
+
+* Check Performance and query optimization having performant API with fewer SQL queries and faster API responses.
+
+, and finally, security aspects.
+
+# Setup Local Dev Container
 
 * open vscode
 
-* create a debian dev container file using vscode with features of node, postgres, python and vscode extensions.
+* create a debian dev container file using vscode with features of node, postgres, python and vscode extensions. Make sure we have `Node LTS`.
+
+* npm install -g yarn
 
 * Initialize Virtual env:
     python3 -m venv venv && source ./venv/bin/activate
@@ -55,7 +83,7 @@
     POSTGRES_DB=postgres
     ENV=DEV
 
-### Setup Django Project and app:
+# Setup Django Project and app:
 
 * Setup Django Project in jadngoProject directory after activating venv in djangoApp directory:
     django-admin startproject root .
@@ -71,7 +99,7 @@
 * Start Django Server:
     python manage.py runserver 0.0.0.0:8000
 
-### Configure postgres on remote or local:
+# Configure postgres on remote or local:
 
 * Configure postgres container:
     docker exec -it 9393a6bd626d bash
@@ -112,7 +140,7 @@
         }
     }
 
-### Create user app:
+# Create user app:
 
 * Create user application under apps
     cd apps && django-admin startapp user
@@ -156,7 +184,7 @@
     
     user.password
 
-### Add Rest Framework to user app:
+# Add Rest Framework to user app:
 
 * Add rest_framework to installedapps:
     "rest_framework"
@@ -191,7 +219,7 @@
     "last_name": "Hey"
 }
 
-### Create auth app for register of users:
+# Create auth app for register of users:
 
 * Now that we are done with the user application, we can confidently move on to adding a login and user registration feature to the project, so that users can be authenticated to access the resources.
 
@@ -236,7 +264,7 @@
 
 * If we try sending same request we get a 400 error bad request, as the user already exists.
 
-### auth Login and Referesh API for users:
+# auth Login and Referesh API for users:
 
 * The next step is adding the login endpoint following the same process: writing the serializer and the viewset, and then registering the route.
 
@@ -267,7 +295,7 @@
 
     Refresh tokens are exchanged for new access tokens when the current access token expires, without needing the users to log in again and again. This allows continuous access to protected resources and enhances user experience.
 
-### Optimize code using DRY by creating abstract classes for model, serializer and viewsets.
+# Optimize code using DRY by creating abstract classes for model, serializer and viewsets.
 
 * Lets follow DRY, The DRY(Dont Repeat Yourself) principle is a best practice in software development that encourages software developers to avoid repetition of instructions. We will create a abstract model class, as we will create many models that will have similar fields.
 
@@ -291,7 +319,7 @@
 
 * The next step is to add the `AbstractViewSet class to the code where ModelViewSets` is actually called. Go to `apps/user/viewsets.py` and `subclass UserViewSet with the AbstractViewSet class`.
 
-### Create post app
+# Create post app
 
 * Till now, we used models, serializers, viewsets, and routes to create our first endpoints.
 
@@ -366,7 +394,7 @@ let’s create a post:
         "body": "A simple post"
     }
 
-### Configure Authorization i.e. permissions: 
+# Configure Authorization i.e. permissions: 
 
 * Create a superuser: 
     `python manage.py createsuperuser --username admin --email admin@example.com`
@@ -390,7 +418,7 @@ let’s create a post:
     "body": "A simple post edited"
     }
 
-### Adding Like Feature to posts:
+# Adding Like Feature to posts:
 
 * Adding Like Feature:
     Add a new posts_liked field to the User model.
@@ -419,7 +447,7 @@ let’s create a post:
     http://0.0.0.0:8000/api/post/a795d4d1f7524b4faf0ee37e174914ea/like/
     http://0.0.0.0:8000/api/post/a795d4d1f7524b4faf0ee37e174914ea/remove_like/
 
-### Create comment app, to add and delete comments to our posts:
+# Create comment app, to add and delete comments to our posts:
 
 A comment in the context of this project will represent short text that can be viewed by anyone but only be created or updated by authenticated users.
     Any user can read comments.
@@ -475,7 +503,7 @@ A comment in the context of this project will represent short text that can be v
     "post": ""a795d4d1f7524b4faf0ee37e174914ea""
     }    
 
-### Testing Rest APIs:
+# Testing Rest APIs:
 
 * Testing Application using pytest; Create a file pytest.ini at root of project, i.e. where manage.py is present.
 
@@ -505,7 +533,29 @@ A comment in the context of this project will represent short text that can be v
 
 * Do the same with comment, user, auth etc.
 
-### Deployment to AWS:
+# Add Logout endpoint:
+
+Add `"rest_framework_simplejwt.token_blacklist",` to installed apps.
+
+Create a file called `logout.py` in the `apps/auth/viewsets` directory. This file will contain the code for the viewsets and the logic to denylist a token.
+
+The logout endpoint will only accept POST requests, because the client will be required to pass a refresh token within the body of the POST request. We also specify that only authenticated users have permission to access this endpoint.
+
+Add the newly created ViewSet in the `routers.py` file and register a new route
+
+add a test for the newly added route in the `core/auth/tests/test_viewsets.py` file
+
+change permissions in `permissions.py` in `auth`.
+
+Run tests using `pytest` or `docker-compose exec -T api pytest`
+
+# Add Caching
+
+Implement caching in the Django application for optimized data retrieval.
+
+Redis 
+
+# Deployment to AWS:
 
     How do we make changes to our code and make deployment and testing automatic
 
@@ -554,7 +604,7 @@ A comment in the context of this project will represent short text that can be v
 optional at last:
 cd usercode/django-api/ && cp -r runserver.py /usr/local/lib/python3.10/dist-packages/django/core/management/commands/runserver.py  && service postgresql start &&  python manage.py makemigrations && python manage.py migrate && python manage.py runserver > /dev/null 2>&1 &
 
-## DB Migration Issue:
+# DB Migration Issue:
 
 * python manage.py showmigrations
 
@@ -565,6 +615,6 @@ cd usercode/django-api/ && cp -r runserver.py /usr/local/lib/python3.10/dist-pac
 
 * drop database coredb; -> CREATE DATABASE coredb;
 
-## Restart Postgresql in dev container:
+# Restart Postgresql in dev container:
 
 service postgresql --full-restart
