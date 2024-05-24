@@ -277,11 +277,17 @@ We covered:
 
 * If we try sending same request we get a 400 error bad request, as the user already exists.
 
+* we don’t need to revalidate fields such as email or password. Because we declared these fields with some conditions, Django will automatically handle their validation.
+
 # auth Login and Referesh API for users:
 
 * The next step is adding the login endpoint following the same process: writing the serializer and the viewset, and then registering the route.
 
+* Using the djangorestframework-simplejwt package, which provides a serializer called TokenObtainPairSerializer, we’ll write a serializer to check for user authentication but also return a response containing access and refresh tokens. For this, we will rewrite the validate method from the TokenObtainPairSerializer class.
+
 * Inside the apps/auth/serializers directory, create a new file called login.py (this file will contain LoginSerializer, a subclass of TokenObtainPairSerializer)
+
+* We are surcharging the validate method from the TokenObtainPairSerializer class to adapt it to our needs. That’s why super is helpful here. It’s a built-in method in Python that returns a temporary object that can be used to access the class methods of the base class.
 
 * Once the serializer is written, don’t forget to import it to the __init__.py file.
 

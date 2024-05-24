@@ -5,7 +5,8 @@ from rest_framework import status
 from rest_framework_simplejwt.tokens import RefreshToken
 from apps.auth.serializers import RegisterSerializer
 
-
+# We are also rewriting the create method to add access and refresh tokens in the body of the response. 
+# The djangorestframework-simplejwt package provides utilities we can use to generate tokens directly. That’s what RefreshToken.for_user(user) does.
 class RegisterViewSet(ViewSet):
     serializer_class = RegisterSerializer
     permission_classes = (AllowAny,)
@@ -25,5 +26,5 @@ class RegisterViewSet(ViewSet):
         return Response({
             "user": serializer.data,
             "refresh": res["refresh"],
-            "token": res["access"]
+            "access": res["access"],
         }, status=status.HTTP_201_CREATED)
