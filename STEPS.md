@@ -164,6 +164,21 @@ We covered:
     created: datetime
     updated: datetime
 
+* Moving on we will update it as for like feature:
+    public id: string
+    last_name: string
+    first_name:string
+    username: string
+    bio: string
+    avatar: image
+    email: string
+    post_liked: m2m
+    author: FK<User>
+    is_active
+    is_superuser
+    created: datetime
+    updated: datetime
+
 * Register user in settings.py, using name field of apps.py of user `"apps.user"`.
 
 * We also need to tell Django to use this User model for the authentication user model. In the settings.py file add below at last line:
@@ -373,6 +388,18 @@ We covered:
     created: datetime
     updated: datetime
 
+*  Django models actually provide tools to handle this kind of relationship. It’s also symmetrical, meaning that not only can we use the Post.author syntax to access the user object but we can also access posts created by a user using the User.post_set syntax. The latter syntax will return a queryset object containing the posts created by the user because we are in a ForeignKey relationship, which is also a one-to-many relationship. You will also notice the on_delete attribute with the models.CASCADE value. Using CASCADE, if a user is deleted from the database, Django will also delete all records of posts in relation to this user.
+
+Apart from CASCADE as a value for the on_delete attribute on a ForeignKey relationship, we can also have the following:
+
+SET_NULL: This will set the child object foreign key to null on delete. For example, if a user is deleted from the database, the value of the author field of the posts in relation to this user is set to None.
+
+SET_DEFAULT: This will set the child object to the default value given while writing the model. It works if you are sure that the default value won’t be deleted.
+
+RESTRICT: This raises the RestrictedError under certain conditions.
+
+PROTECT: This prevents the foreign key object from being deleted as long as there are objects linked to the foreign key object.
+
 * Add the newly created application to the INSTALLED_APPS list
 
 * python manage.py makemigrations && python manage.py migrate
@@ -395,7 +422,15 @@ let’s create a post:
     post.author
     user.post_set.all()
 
+* the post_set attribute contains all the instructions needed to interact with all the posts linked to this user.
+
 * writing the `serializer of the Post object`: The Post serializer will contain the fields needed to create a post when making a request on the endpoint. Let’s add the feature for the post creation first. In the post directory, create a file called `serializers.py`. 
+
+* We’ve added a new serializer field type, SlugRelatedField. As we are working with the ModelSerializer class, Django automatically handles the fields and relationship generation for us. Defining the type of relationship field we want to use can also be crucial for telling Django exactly what to do.
+
+And that’s where SlugRelatedField comes in. It is used to represent the target of the relationship using a field on the target. Therefore, when creating a post, the public_id of the author will be passed in the body of the request so that the user can be identified and linked to the post.
+
+The validate_author method checks validation for the author field. Here, we want to make sure that the user creating the post is the same user as in the author field. A context dictionary is available in every serializer. It usually contains the request object that we can use to make some checks.
 
 * Writing Post Viewsets, For the following endpoint, we’ll only be allowing the POST and GET methods. This will help us have the basic features working first. The code should follow these rules:
 
@@ -406,6 +441,12 @@ let’s create a post:
     Only GET and POST methods are allowed.
 
 * Inside the post directory, create a file called viewsets.py. 
+
+* The get_queryset method returns all the posts. We don’t actually have particular requirements for fetching posts, so we can return all posts in the database.
+
+The get_object method returns a post object using public_id that will be present in the URL. We retrieve this parameter from the self.kwargs directory.
+
+The create method, which is the ViewSet action executed on POST requests on the endpoint linked to ViewSet. We simply pass the data to the serializer declared on ViewSet, validate the data, and then call the perform_create method to create a post object. This method will automatically handle the creation of a post object by calling the Serializer.create method, which will trigger the creation of a post object in the database. Finally, we return a response with the newly created post.
 
 * Adding the Post route#
 
@@ -419,6 +460,12 @@ let’s create a post:
         "body": "A simple post"
     }
 
+* Actually, the author field accepts public_id and returns public_id. While it does the work, it can be a little bit difficult to identify the user. This will cause it to make a request again with the public_id of the user to get the pieces of information about the user.
+
+The to_representation() method takes the object instance that requires serialization and returns a primitive representation. This usually means returning a structure of built-in Python datatypes. The exact types that can be handled depend on the render classes you configure for your API.
+
+As you can see, we are using the public_id field to retrieve the user and then serialize the User object with UserSerializer.
+
 # Configure Authorization i.e. permissions: 
 
 * Create a superuser: 
@@ -428,9 +475,19 @@ let’s create a post:
 
 * we hve three types of users, anonymous user, registered, admin. we need to write a custom permission.
 
+* Django permissions usually work on two levels: on the overall endpoint (has_permission) and on an object level (has_object_permission).
+
+A great way to write permissions is to always deny by default; that is why we always return False at the end of each permission method. We can then start adding the conditions. Here, in all the methods, we are checking that anonymous users can only make the SAFE_METHODS requests—GET, OPTIONS, and HEAD.
+
+For other users, we are making sure that they are always authenticated before continuing.
+
 * Inside the `auth` directory, create a file called `permissions.py`.
 
-* Next Allow users to update and delete posts. To add these functionalities, we don’t need to write a serializer or a viewset, because the methods for deletion (destroy()), and updating (update()) are already available by default in the ViewSet class. We will just rewrite the update method on PostSerializer to ensure that the edited field is set to True when modifying a post.
+* Next Allow users to update and delete posts. 
+
+* To add these functionalities, we don’t need to write a serializer or a viewset, because the methods for deletion (destroy()), and updating (update()) are already available by default in the ViewSet class. 
+
+* We will just rewrite the update method on PostSerializer to ensure that the edited field is set to True when modifying a post.
 
 * Let’s add the PUT and DELETE methods to http_methods of PostViewSet
 
@@ -442,6 +499,8 @@ let’s create a post:
     "author": "fb2d39265992477da9e437335835a6a9",
     "body": "A simple post edited"
     }
+
+Note: There is a way to delete records without necessarily deleting them from the database. It’s usually called a soft delete. The record just won’t be accessible to the user, but it will always be present in the database.
 
 # Adding Like Feature to posts:
 
@@ -461,6 +520,16 @@ let’s create a post:
 * Inside the apps/post/serializers.py file, add new fields to PostSerializer
 
 * Adding endpoints like and remove like actions to PostViewSet.
+
+* For each action added, we are writing the logic following these steps:
+
+First, we retrieve the concerned post on which we want to call the like or remove the like action. The self.get_object() method will automatically return the concerned post using the ID passed to the URL request, thanks to the detail attribute being set to True.
+
+Second, we also retrieve the user making the request from the self.request object. This is done so that we can call the remove_like or like method added to the User model.
+
+And finally, we serialize the post using the Serializer class defined on self.serializer_class and we return a response.
+
+With this added to PostViewSets, the Django Rest Framework routers will automatically create new routes for this resource.
 
 * makemigrations and migrate
 
