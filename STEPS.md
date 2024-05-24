@@ -354,18 +354,24 @@ We covered:
 
 * we’ll be dealing with a database, a model, and permissions.
 
-* Create Post Model, there is an author field, which is a foreign key. A foreign key is a set of attributes in a table that refers to the primary key of another table. In our case, the foreign key will refer to the primary key of the User table. Each time a post is created, a foreign key will need to be passed.
-
 * The foreign key is one of the characteristics of the one-to-many (or many-to-one) relationship. In this relationship, a row in table A can have many matching rows in table B (one-to-many), but a row in table B can only have one matching row in table A.
 
 * In our case, a user (from the User table) can have many posts (in the Post table) but a post can only have one user. The many-to-many relationship will be used when writing the like feature for the posts.
 
 * Now lets create post app:
-    django-admin startapp post
+    `django-admin startapp post`
 
 * Rewrite apps.py of the new create package so it can be called easily in the project.
 
-* Create post model.
+* Create Post Model, there is an author field, which is a foreign key. A foreign key is a set of attributes in a table that refers to the primary key of another table. In our case, the foreign key will refer to the primary key of the User table. Each time a post is created, a foreign key will need to be passed.
+
+* Post Table Fields:
+    public id: string
+    author: FK<User>
+    body: string
+    edited: boolean
+    created: datetime
+    updated: datetime
 
 * Add the newly created application to the INSTALLED_APPS list
 
