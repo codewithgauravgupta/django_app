@@ -24,7 +24,7 @@ We covered:
 
 , and finally, security aspects.
 
-# Setup Local Dev Container
+# Setup Dev Environment
 
 * open vscode
 
@@ -67,8 +67,6 @@ We covered:
 
     ssh -i "django_backend_keys.pem" admin@ec2-13-238-194-209.ap-southeast-2.compute.amazonaws.com
 
-
-
 * Create .env file at root of project on both local and ec2:
     SECRET_KEY=DEV_SECRET_KEY
     DJANGO_ALLOWED_HOSTS=*
@@ -86,18 +84,22 @@ We covered:
 # Setup Django Project and app:
 
 * Setup Django Project in jadngoProject directory after activating venv in djangoApp directory:
-    django-admin startproject root .
+
+    `django-admin startproject root .`
 
 * Create a core application that will hold all apps of django project.
-    django-admin startapp apps
+    
+    `django-admin startapp apps`
 
 * Add label in class of apps in apps.py
-    label = 'apps'
+   
+    `label = 'apps'`
 
 * Register apps in settings.py of root INSTALLED_APPS, using name field of apps.py of `apps`.
 
 * Start Django Server:
-    python manage.py runserver 0.0.0.0:8000
+    
+    `python manage.py runserver 0.0.0.0:8000`
 
 # Configure postgres on remote or local:
 
@@ -143,13 +145,24 @@ We covered:
 # Create user app:
 
 * Create user application under apps
-    cd apps && django-admin startapp user
+    `cd apps && django-admin startapp user`
 
 * Modify apps.py of user with label:
     name = "apps.user"
     label = "apps_user"
 
-* Create user model in user models.py
+* Create user model in user models.py, The user table is as follows:
+    public_id: string
+    last_name: string
+    first_name: string
+    username: string
+    bio: string
+    avatar: image
+    email: string
+    is_active
+    is_superuser
+    created: datetime
+    updated: datetime
 
 * Register user in settings.py, using name field of apps.py of user `"apps.user"`.
 
@@ -553,7 +566,107 @@ Run tests using `pytest` or `docker-compose exec -T api pytest`
 
 Implement caching in the Django application for optimized data retrieval.
 
-Redis 
+Check service status `service redis-server status`, in dev container or in docker.
+
+CACHES setting in the settings.py file.
+
+Caching depends a lot on the business requirements for how much time you want to cache the data. Django provides many levels for caching:
+
+* Per-site cache: This enables us to cache our entire website.
+
+* Template fragment cache: This enables us to cache some components of the website. For example, we can decide to only cache the footer.
+
+* Per-view cache: This enables us to cache the output of individual views.
+
+* Low-level cache: Django provides an API we can use for interacting directly with the cache. It is useful if we want to produce a certain behavior based on a set of actions. For example, in this course, if a post is updated or deleted, we will update the cache.
+
+Our requirement is if there is a delete or an update on a comment or a post, the cache is updated. Otherwise, we return the same information in the cache to the user.
+
+This can be achieved in many ways. We can use Django signals or directly add custom methods to the manager of the model’s Post and Comment classes. Let’s go with the latter. 
+
+We will surcharge the save and delete methods of the AbstractModel class, so if there is an update on a Post or Comment object, we update the cache.
+
+Inside the apps/abstract/models.py file, add the following method on top of the file after the imports:
+
+```python
+from django.core.cache import cache
+...
+def _delete_cached_objects(app_label):
+ if app_label == "core_post":
+ cache.delete("post_objects")
+ elif app_label == "core_comment":
+ cache.delete("comment_objects")
+ else:
+ raise NotImplementedError
+```
+The function in the preceding code takes an application label, and according to the value of this app_label, we invalidate the corresponding cache. For the moment, we only support caching for posts and comments. Notice how the name of the function is prefixed with a _. This is a coding convention to specify that this method is private and should not be used outside the file where it is declared.
+
+Inside the AbstractModel class, we can surcharge the save method. Before the save method is executed, we invalidate the cache. This means that on operations such as create and update, the cache will be reset:
+```python
+class AbstractModel(models.Model):
+...
+ def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
+        app_label = self._meta.app_label
+        if app_label in ["core_post", "core_comment"]:
+            _delete_cached_objects(app_label)
+        return super(AbstractModel, self).save(force_insert=force_insert,force_update=force_update,using=using,update_fields=update_fields)
+```
+In the preceding code, we retrieve app_label from the _meta attribute on the model. If it corresponds to either core_post or core_comment, we invalidate the cache, and the rest of the instructions can proceed. Let’s do the same for the delete method:
+
+```python
+class AbstractModel(models.Model):
+…
+ def delete(self, using=None, keep_parents=False):
+        app_label = self._meta.app_label
+        if app_label in ["core_post", "core_comment"]:
+            _delete_cached_objects(app_label)
+        return super(AbstractModel, self).delete(using=using, keep_parents=keep_parents)
+```
+
+The cache invalidation logic has been implemented on the models. Let’s add the logic for cache data retrieving on the viewsets of the core_post application and the core_comment application.
+
+`Retrieving data from the cache`:
+
+The cache invalidation is ready, so we can freely retrieve data from the cache on the endpoints for the posts and the comments. 
+
+Inside the PostViewSet class, we will rewrite the list() method. On the Django REST framework (DRF) open-source repository, the code looks like this:
+
+```python
+"""List a queryset"""
+def list(self, request, *args, **kwargs):
+    queryset = self.filter_queryset(self.get_queryset())
+    page = self.paginate_queryset(queryset)
+    if page is not None:
+        serializer = self.get_serializer(page, many=True)
+        return self.get_paginated_response(serializer.data)
+    
+    serializer = self.get_serializer(queryset, many=True)
+    return Response(serializer.data)
+```
+In the preceding code, a queryset call is made to retrieve the data, and then this queryset call is paginated, serialized, and returned inside a Response object. Let’s tweak the method a little bit:
+
+```python
+def list(self, request, *args, **kwargs):
+    post_objects = cache.get("post_objects")
+    if post_objects is None:
+        post_objects = self.filter_queryset(self.get_queryset())
+        cache.set("post_objects", post_objects)
+    page = self.paginate_queryset(post_objects)
+    if page is not None:
+        serializer = self.get_serializer(page, many=True)
+        return self.get_paginated_response(serializer.data)
+    serializer = self.get_serializer(post_objects, many=True)
+    return Response(serializer.data)
+```
+In the preceding code, instead of doing a lookup on the database directly, we check the cache. If post_objects is None when making a query to the database, save queryset in the cache and finally proceed to return the cache objects to the user.
+
+As you can see, the process is very simple. We just need to have a robust caching strategy. You can do the same for CommentViewSet
+
+# optimize the backend build using webpack:
+
+search on internet see if this is possible.
+
+# Secure the full stack application over HTTPS using AWS CloudFront.
 
 # Deployment to AWS:
 
@@ -604,7 +717,7 @@ Redis
 optional at last:
 cd usercode/django-api/ && cp -r runserver.py /usr/local/lib/python3.10/dist-packages/django/core/management/commands/runserver.py  && service postgresql start &&  python manage.py makemigrations && python manage.py migrate && python manage.py runserver > /dev/null 2>&1 &
 
-# DB Migration Issue:
+# DB Migration Issue (Migration admin.0001_initial is applied before its dependency core_user.0001_initial on database 'default'.):
 
 * python manage.py showmigrations
 
@@ -614,6 +727,16 @@ cd usercode/django-api/ && cp -r runserver.py /usr/local/lib/python3.10/dist-pac
     SELECT pg_terminate_backend(pg_stat_activity.pid) FROM pg_stat_activity WHERE pg_stat_activity.datname = 'coredb' AND pid <> pg_backend_pid();
 
 * drop database coredb; -> CREATE DATABASE coredb;
+
+$ sudo su postgres
+$  psql
+postgres=# DROP DATABASE coredb;
+postgres=# CREATE DATABASE coredb;
+postgres=# ALTER ROLE core SET client_encoding TO 'utf8';
+postgres=# ALTER ROLE core SET default_transaction_isolation TO 'read committed';
+postgres=# ALTER ROLE core SET timezone TO 'UTC';
+postgres=# ALTER DATABASE coredb OWNER TO core;
+postgres=# GRANT ALL PRIVILEGES ON DATABASE coredb TO core;
 
 # Restart Postgresql in dev container:
 

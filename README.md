@@ -29,3 +29,32 @@ Recommendations: Users must get recommendations based on their search and behavi
 
 Advertisements: Once we have enough DAU we can earn revenue from advertisements.
 
+# Features Developed
+
+* Client-Server Architecture (User <-> Front-End <-> Web-Server(NGINX) <-> Application-Server(DJANGO+DRF+APIs) <-> DB)
+
+* MVT Architecture of Django
+
+* Authentication and Authorization Using JWTs with custom permissions.
+
+* CRUD operations with postgres db using db-relations, serializers and ViewSets.
+
+* RESTful APIs
+
+* Testing of API and Application
+
+* User Profiles
+
+* Creating Post and Comments with like and unlike
+
+* Dockerize application
+
+* CI/CD: Manual and Automatic Deployment to AWS EC2 and S3 using github actions.
+
+
+* 
+
+
+
+
+
