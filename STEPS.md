@@ -544,6 +544,7 @@ With this added to PostViewSets, the Django Rest Framework routers will automati
 # Create comment app, to add and delete comments to our posts:
 
 A comment in the context of this project will represent short text that can be viewed by anyone but only be created or updated by authenticated users.
+
     Any user can read comments.
 
     Authenticated users can create comments under posts.
@@ -554,10 +555,24 @@ A comment in the context of this project will represent short text that can be v
 
 * Create comment app
 
-* Adding Comments to Social Media Posts:
-    Writing the Comment model.
+* Writing the Comment model.
+    public_id: string
+    body: string
+    author: FK
+    post: FK
+    edited: boolean
+    created: datetime
+    updated: datetime
 
-    makemigrations and migrate
+    A comment will mostly have four important fields: the author of the comment, the post on which the comment has been made, the body of the comment, and the edited field to track whether the comment has been edited or not.
+
+    the author (User) and post (Post) fields are ForeignKey types. This relates to some rules for the comment feature:
+
+    * A user can have many comments, but a comment is created by one user.
+
+    * A post can have many comments, but a comment is linked to only one post.
+
+* makemigrations and migrate
 
 * Write comment model based on comment table and Test shell: 
     python manage.py shell
